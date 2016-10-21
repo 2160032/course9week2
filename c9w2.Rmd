@@ -1,0 +1,111 @@
+---
+title: "Course 9 - Week 2"
+author: "Daniel Cialdella - dcialdella@gmail.com"
+date: "October 20, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Real data of "Alcalá de Henares"" City - Madrid
+
+Create a Matrix with data from POIs of my City.
+```{r c1, echo=FALSE}
+data1 <- matrix( NA, nrow=17, ncol=5 )
+
+# This part should be done with a LOCAL FILE, instead of raw data,
+# but now, will work in every PC.
+
+# Lat, Long, Text, Size of Relevance, COLOR/ICON
+z <- 
+c( 
+40.4824856,-3.3654235,"Citihall",5,3,
+40.4862768,-3.3801755,"Train1",6,1,
+40.4816673,-3.3931257,"Train2",3,1,
+40.5043139,-3.3386647,"Train3",1,1,
+40.5052149,-3.3337398,"Shops1",3,2,
+40.5029097,-3.3337295,"Shops2",2,2,
+40.5037812,-3.3669145,"Shops3",4,2,
+40.4797781,-3.3998195,"Shops4",5,2,
+40.4760156,-3.3939596,"Shops5",4,2,
+40.4802155,-3.3783789,"Shops6",3,2,
+40.4936141,-3.3670312,"Shops7",4,2,
+40.4824591,-3.3911546,"Education1",3,4,
+40.4829104,-3.3895981,"Education2",4,4,
+40.4936536,-3.3798743,"Education3",4,4,
+40.4936844,-3.3779865,"Education4",4,4,
+40.4910783,-3.3745762,"Education5",4,4,
+40.4869168,-3.3853926,"FireStation",5,4
+)
+
+cual2 <- 1
+for (cual in seq( from=1,to=82,by=5)){
+   data1[cual2,1] <- z[cual]
+   data1[cual2,2] <- z[cual+1]
+   data1[cual2,3] <- z[cual+2]
+   data1[cual2,4] <- z[cual+3]
+   data1[cual2,5] <- z[cual+4]
+   cual2 <- cual2 + 1
+}
+```
+
+
+## Map 
+Show a Date +60 days ago
+```{r c2b, echo=FALSE}
+as.Date(Sys.time() - (60*60*24*61), format="%d-%m-%Y")
+```
+
+Map showing POI's
+```{r c2, echo=FALSE}
+library(leaflet)
+library(dplyr)
+
+my_map <- leaflet() %>% addTiles() 
+my_map <- my_map %>% setView( lat=data1[1,1], lng=data1[1,2], zoom=13 )
+
+for (cual in seq( from=1,to=17)){
+   my_map <- my_map %>% addTiles() %>% 
+     addMarkers(lat=data1[cual,1] , lng=data1[cual,2] , popup=paste("<b>",as.character(data1[cual,3]),
+       "</b><br><a href='http://www.ayto-alcaladehenares.es/", as.character(data1[cual,3]) ,".html'>Link to Site</a>" ))
+
+      # my_map <- my_map %>% addMarkers(lat= data1[cual,1] , lng=data1[cual,2] , icon=data1[cual,3])
+}
+
+# my_map <- my_map %>% addMarkers(clusterOptions = markerClusterOptions() )
+
+my_map <- my_map %>% addLegend("bottomright", colors=c("#0040FF","#ff60FF"), label=c("POIs","Others"), title="Alcalá de Henares")
+my_map
+```
+
+
+## Map with The CityHall and the Old Town point
+Shopping places in AdH.
+```{r c3, echo=FALSE}
+library(leaflet)
+library(dplyr)
+
+my_map <- leaflet() %>% addTiles() 
+my_map <- my_map %>% setView( lat=data1[1,1], lng=data1[1,2], zoom=13 )
+
+for (cual in seq( from=1,to=17)){
+  if ( data1[cual,3] == "Citihall" )
+  {
+     my_map <- my_map %>% addTiles() %>% 
+     addMarkers(lat=data1[cual,1] , lng=data1[cual,2] , popup=paste("<b>",as.character(data1[cual,3]),
+       "</b><br><a href='http://www.ayto-alcaladehenares.es/'>Link to Site</a>" ))
+
+      # my_map <- my_map %>% addMarkers(lat= data1[cual,1] , lng=data1[cual,2] , icon=data1[cual,3])
+  }
+}
+
+# my_map <- my_map %>% addMarkers(clusterOptions = markerClusterOptions() )
+
+my_map <- my_map %>% addLegend("bottomright", colors=c("#FF40FF"), label=c("CityHall"), title="Alcalá de Henares")
+my_map
+```
+
+
+Text
